@@ -31,7 +31,6 @@ conn = mysql.connector.connect(
     database='messages')
 cur = conn.cursor()
 
-
 menu_media = FSInputFile('../user_profile_photos/media.jpg')
 
 registration_mode = CHAT_MODE = 0
