@@ -374,7 +374,7 @@ async def callback_handler(callback: types.CallbackQuery) -> None:
 
                 age_dict = {'0': '= `age`', '1': '> 17 AND `age` < 25', '2': '> 24 AND `age` < 35', '3': '> 35'}
                 [pref_age, pref_gender, city_matter, city, user_fid] = cur.fetchone()
-                city_dict = {'0': '`city`', '1': city}
+                city_dict = {'0': '`city`', '1': f'{city}'}
 
                 if callback.data == 'roll_profiles':
                     profile_offset = 0
@@ -541,12 +541,14 @@ async def check_new_msgs_current_chat(user_id, chat_member) -> None:
         conn.reset_session()
         await asyncio.sleep(0.5)
         try:
-            cursor.execute(f"SELECT `message`, `db_id`  FROM `msgs` WHERE `platform_2` = 'tg' "
-                           f"AND `user1_id` = {chat_member[1]} AND `platform_1` = '{chat_member[0]}' "
-                           f"AND `user2_id` = {user_id} AND `processed` = 0 ORDER BY `msgs`.`datetime` ASC LIMIT 1")
-            response = cur.fetchall()[0]
+            sql = (f"SELECT `message`, `db_id`  FROM `msgs` WHERE `platform_2` = 'tg' AND `user1_id` = {chat_member[1]}"
+                   f" AND `platform_1` = '{chat_member[0]}' AND `user2_id` = {user_id} AND `processed` = 0 "
+                   f"ORDER BY `msgs`.`datetime` ASC LIMIT 1")
+            cursor.execute(sql)
+            response = cursor.fetchall()[0]
             new_msg_current_chat = response[0]
             db_id = response[1]
+
             try:
                 await bot.send_message(chat_id=user_id, text=f'{new_msg_current_chat}')
                 cursor.execute(f'UPDATE `msgs` SET `processed` = 1 WHERE `db_id` = {db_id}')
