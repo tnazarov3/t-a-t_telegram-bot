@@ -373,7 +373,7 @@ async def callback_handler(callback: types.CallbackQuery) -> None:
 
                 age_dict = {'0': '= `age`', '1': '> 17 AND `age` < 25', '2': '> 24 AND `age` < 35', '3': '> 35'}
                 [pref_age, pref_gender, city_matter, city, user_fid] = cur.fetchone()
-                city_dict = {'0': '`city`', '1': f'{city}'}
+                city_dict = {'0': '`city`', '1': f"'{city}'"}
 
                 if callback.data == 'roll_profiles':
                     profile_offset = 0
@@ -498,21 +498,19 @@ async def main_menu_create(user_id):
         inline_main_menu.add(InlineKeyboardButton(text='Смотреть анкеты', callback_data='roll_profiles'))
         try:
             cur.execute(
-                f"SELECT COUNT(`db_id`) FROM `msgs` WHERE (`platform_1` = 'tg' AND `user1_id` = {user_id}) "
+                f"SELECT `db_id` FROM `msgs` WHERE (`platform_1` = 'tg' AND `user1_id` = {user_id}) "
                 f"OR (`platform_2` = 'tg' AND `user2_id` = {user_id})")
-            cur.fetchall()
-
-            try:
-                conn.reset_session()
-                cur.execute(f"SELECT COUNT(`db_id`) FROM `msgs` "
-                            f"WHERE `platform_2` = 'tg' AND `user2_id` = {user_id} AND `processed` = 0")
-                new_msgs_count = int(cur.fetchone()[0])
-            except Exception as err: print('new msgs count\n', err); new_msgs_count = 0
-
-            new_msgs_count = f' ({new_msgs_count})' if new_msgs_count != 0 else ''
-            inline_main_menu.add(InlineKeyboardButton(text=f'Чаты{new_msgs_count}', callback_data='roll_chats'))
+            a = cur.fetchall()
+            if a != []:
+                try:
+                    conn.reset_session()
+                    cur.execute(f"SELECT COUNT(`db_id`) FROM `msgs` "
+                                f"WHERE `platform_2` = 'tg' AND `user2_id` = {user_id} AND `processed` = 0")
+                    new_msgs_count = int(cur.fetchone()[0])
+                except Exception as err: print('new msgs count\n', err); new_msgs_count = 0
+                new_msgs_count = f' ({new_msgs_count})' if new_msgs_count != 0 else ''
+                inline_main_menu.add(InlineKeyboardButton(text=f'Чаты{new_msgs_count}', callback_data='roll_chats'))
         except Exception as err: print('main menu chats existing\n', err)
-
         inline_main_menu.add(InlineKeyboardButton(text='Изменить анкету', callback_data='edit_profile'))
         inline_main_menu.add(InlineKeyboardButton(text='Предпочтения', callback_data='prefs'))
     except Exception as err:
@@ -528,7 +526,6 @@ async def main_menu_create(user_id):
             print('main menu profile existing\n', err)
             inline_main_menu.add(InlineKeyboardButton(text='Зарегистрироваться', callback_data='create_profile'))
             profile_existing = 0
-
     inline_main_menu.adjust(1)
     return inline_main_menu.as_markup()
 
