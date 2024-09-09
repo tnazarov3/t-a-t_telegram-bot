@@ -557,9 +557,14 @@ async def check_new_msgs_current_chat(user_id, chat_member) -> None:
         if stop_thread:
             break
 
+print('ready')
 
 async def main() -> None:
     await dp.start_polling(bot)
 
-
-asyncio.run(main())
+while True:
+    try:
+        asyncio.run(main())
+    except:
+        pass
+    asyncio.sleep(5)
