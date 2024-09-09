@@ -448,6 +448,8 @@ async def callback_handler(callback: types.CallbackQuery) -> None:
                         profile_offset = profile_offset - 1 if profile_offset > 0 else 0
 
                 try:
+                    print(f"SELECT `platform`, `platform_id`, `name`, `photo`, `age`, `description`, `city` FROM `profiles` "
+                    f"WHERE `platform` = '{chats_list[profile_offset][0]}' AND `platform_id` = {chats_list[profile_offset][1]}")
                     cur.execute(
                         f"SELECT `platform`, `platform_id`, `name`, `photo`, `age`, `description`, `city` FROM `profiles` "
                         f"WHERE `platform` = '{chats_list[profile_offset][0]}' AND `platform_id` = {chats_list[profile_offset][1]}")
@@ -561,5 +563,9 @@ async def check_new_msgs_current_chat(user_id, chat_member) -> None:
 async def main() -> None:
     await dp.start_polling(bot)
 
-
-asyncio.run(main())
+while True:
+    try:
+        asyncio.run(main())
+    except:
+        pass
+    asyncio.sleep(5)
