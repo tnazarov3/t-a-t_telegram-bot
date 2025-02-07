@@ -559,7 +559,7 @@ async def check_new_msgs_current_chat(user_id, chat_member) -> None:
         if stop_thread:
             break
 
-print('ready')
+print('Ready')
 
 async def main() -> None:
     await dp.start_polling(bot)
